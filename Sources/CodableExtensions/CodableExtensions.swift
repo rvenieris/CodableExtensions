@@ -244,7 +244,7 @@ extension Data {
     }
     
         /// Saves data in a file in default.temporaryDirectory, returning URL
-    func saveInTemp()throws->URL {
+    public func saveInTemp()throws->URL {
         let tmpDirURL = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString+".data")
         try self.write(to: tmpDirURL)
         return tmpDirURL
@@ -252,7 +252,7 @@ extension Data {
     
         /// save in localDir, returning success
     @discardableResult
-    func saveInLocalDir(naming file:String?, extension ext:String? = nil)->Bool {
+    public func saveInLocalDir(naming file:String?, extension ext:String? = nil)->Bool {
         guard let url = URL.localPath(for: file, extension: ext) else {return false}
         do {
             try self.write(to: url)
@@ -270,7 +270,7 @@ extension URL {
     }
     
         /// returns URL in document directory
-    static func localPath(for fileName: String?, extension ext:String? = nil)->URL? {
+    public static func localPath(for fileName: String?, extension ext:String? = nil)->URL? {
         var ext = ext ?? ""
         ext = ext.isEmpty ? "" : "."+ext
         guard let fileName = fileName else {return nil}
@@ -279,13 +279,13 @@ extension URL {
     }
     
         /// returns URL if file exists in document directory
-    static func ifExists(file fileName: String?, extension ext:String? = nil)->URL? {
+    public static func ifExists(file fileName: String?, extension ext:String? = nil)->URL? {
         guard let url = URL.localPath(for: fileName, extension: ext),
               FileManager.default.fileExists(atPath: url.path) else {return nil}
         return url
     }
     
-    static func jsonPath(for name:String? = nil)throws ->URL {
+    public static func jsonPath(for name:String? = nil)throws ->URL {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
         guard let url = URL.localPath(for: fileName+ext) else {
@@ -313,7 +313,7 @@ extension Dictionary where Key == String {
 }
 
 extension String {
-    var asData:Data? {
+    public var asData:Data? {
         return self.data(using: .utf8)
     }
 }
