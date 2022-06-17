@@ -1,14 +1,10 @@
 import XCTest
-@testable import CodableExtension
+@testable import CodableExtensions
 
-final class CodableExtensionTests: XCTestCase {
-    func testExample() {
+final class CodableExtensionsTests: XCTestCase {
+    func testExample() throws {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct
         // results.
     }
-
-    static var allTests = [
-        ("testExample", testExample),
-    ]
 }

@@ -47,7 +47,11 @@ extension Encodable {
         
         guard let json:Data  = self.jsonData,
               let jsonObject = try? JSONSerialization.jsonObject(with: json, options: jSONSerializationDefaultReadingOptions) else {
-            os_log("Cannot Decode %@ type as Dictionary", type:.error, String(describing: type(of:self)))
+            if #available(macOS 10.12, *) {
+                os_log("Cannot Decode %@ type as Dictionary", type:.error, String(describing: type(of:self)))
+            } else {
+                    // Fallback on earlier versions
+            }
             return nil
         }
             // if jsonObject is OK
@@ -380,5 +384,3 @@ public struct CertifiedCodableData:Codable {
         }
     }
 }
-
-
