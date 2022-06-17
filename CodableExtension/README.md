@@ -44,97 +44,116 @@ try ? let ricardo = Person.load(from: "ricardovenieris")  // loading from ricard
 
 
 
-
-
-
 ```swift
 extension Encodable {
 
-var asString:String? { get }
+    var asString:String? { get }
 
-var jsonData:Data? { get }
+    var jsonData:Data? { get }
 
-var asDictionary:[String: Any]? { get }
+    var asDictionary:[String: Any]? { get }
 
-var asArray:[Any]? { get }
+    var asArray:[Any]? { get }
 
-func save() throws
+    func save() throws
 
-func save(in file:String?) throws
+    func save(in file:String?) throws
 
-func save(in url:URL) throws
+    func save(in url:URL) throws
 }
 
 extension Decodable {
 
-/// Mutating Loads
-mutating func load(from data:Data) throws
+    /// Mutating Loads
+    mutating func load(from data:Data) throws
 
-mutating func load(from url:URL) throws
+    mutating func load(from url:URL) throws
 
-mutating func load() throws
+    mutating func load() throws
 
-mutating func load(from file:String?) throws
+    mutating func load(from file:String?) throws
 
-mutating func load(fromStringData stringData:String) throws
+    mutating func load(fromStringData stringData:String) throws
 
-mutating func load(from dictionary:[String:Any]) throws
+    mutating func load(from dictionary:[String:Any]) throws
 
-mutating func load(from array:[Any]) throws
+    mutating func load(from array:[Any]) throws
 
-/// Static Loads
-static func load(from data:Data)throws ->Self
+    /// Static Loads
+    static func load(from data:Data)throws ->Self
 
-static func load(from url:URL) throws  ->Self
+    static func load(from url:URL) throws  ->Self
 
-static func load()throws ->Self
+    static func load()throws ->Self
 
-static func load(from file:String?)throws ->Self
+    static func load(from file:String?)throws ->Self
 
-static func load(fromString stringData:String)throws ->Self
+    static func load(fromString stringData:String)throws ->Self
 
-static func load(from dictionary:[String:Any])throws ->Self
+    static func load(from dictionary:[String:Any])throws ->Self
 
-static func load(from array:[Any])throws ->Self
+    static func load(from array:[Any])throws ->Self
 
-static func url()->URL
+    static func url()->URL
 
-static func url(from file:String?)->URL
+    static func url(from file:String?)->URL
+
+    static func urlOrJsonPath()throws ->URL
+
+    static func urlOrJsonPath(from file:String?)throws ->URL
 
 }
 
 /// Type Extensions
 extension Data {
 
-var toText:String { get }
+    var toText:String { get }
 
-var toDictionary:[AnyHashable:Any] { get }
+    var toDictionary:[AnyHashable:Any] { get }
 
-var toArray:[Codable]? { get }
+    var toArray:[Codable]? { get }
 
-func convert<T>(to:T.Type) throws ->T where T:Codable
+    func convert<T>(to:T.Type) throws ->T where T:Codable
 
-}
+    /// Saves data in a file in default.temporaryDirectory, returning URL
+    func saveInTemp()throws->URL
 
-extension URL {
-var contentAsData:Data? { get }
+    /// save in localDir, returning success
+    @discardableResult
+    func saveInLocalDir(naming file:String?, extension ext:String?)->Bool
+    }
+
+    extension URL {
+    var contentAsData:Data? { get }
+
+    /// returns URL in document directory
+    static func localPath(for fileName: String?, extension ext:String?)->URL?
+
+    /// returns URL if file exists in document directory
+    static func ifExists(file fileName: String?, extension ext:String?)->URL?
+
+    static func jsonPath(for name:String?)throws ->URL
 }
 
 
 extension Array {
-var asData:Data? { get }
+    var asData:Data? { get }
 }
 
 extension Dictionary where Key == String { 
-var asData:Data? { get }
-
+    var asData:Data? { get }
 }
+
+extension String {
+    var asData:Data?
+}
+
 
 struct CertifiedCodableData:Codable {
 
-var dictionary:[String:Any] { get }
+    var dictionary:[String:Any] { get }
 
-init(_ originalData:[String:Any])
+    init(_ originalData:[String:Any])
 
 }
 
