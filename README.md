@@ -1,16 +1,13 @@
 # CodableExtensions
 This package add saving and loading capabilities to Codable Types
 
-## Important!
-
-Add the Swift Package into "TARGET -> General -> Frameworks, Libraries, and Embedded Content".
-
-
 e.g.: 
 
 If you have the followig struct:
 ```swift
-struct Person {
+import CodableExtensions
+
+struct Person:Codable {
 	var name:String
 	var age:Int
 }
