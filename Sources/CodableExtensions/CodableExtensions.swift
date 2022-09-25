@@ -19,13 +19,13 @@ public enum FileManageError:Error {
     case invalidFileName
 }
 
-extension Error {
+public extension Error {
     public var asString:String {
         return String(describing: self)
     }
 }
 
-extension Encodable {
+public extension Encodable {
     
     private var jSONSerializationDefaultReadingOptions:JSONSerialization.ReadingOptions {
         [JSONSerialization.ReadingOptions.allowFragments, JSONSerialization.ReadingOptions.mutableContainers, JSONSerialization.ReadingOptions.mutableLeaves]
@@ -103,7 +103,7 @@ extension Encodable {
     }
 }
 
-extension Decodable {
+public extension Decodable {
     
         /// Mutating Loads
     public mutating func load(from data:Data) throws {
@@ -210,7 +210,7 @@ extension Decodable {
 
 
     /// Type Extensions
-extension Data {
+public extension Data {
     
     public var toText:String {
         return String(data: self, encoding: .utf8) ?? #""ERROR": "cannot decode into String"""#
