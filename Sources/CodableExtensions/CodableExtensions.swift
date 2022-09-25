@@ -301,14 +301,16 @@ public extension Dictionary where Key == String {
 
 public struct CertifiedCodableData:Codable {
     private var bool:[String:Bool] = [:]
-    private var number:[String:Double] = [:]
+    private var int:[String:Int] = [:]
+    private var double:[String:Double] = [:]
     private var date:[String:Date] = [:]
     private var string:[String:String] = [:]
     private var data:[String:Data] = [:]
     private var custom:[String:CertifiedCodableData] = [:]
 
     private var boolArray:[String:[Bool]] = [:]
-    private var numberArray:[String:[Double]] = [:]
+    private var intArray:[String:[Int]] = [:]
+    private var doubleArray:[String:[Double]] = [:]
     private var dateArray:[String:[Date]] = [:]
     private var stringArray:[String:[String]] = [:]
     private var dataArray:[String:[Data]] = [:]
@@ -317,14 +319,16 @@ public struct CertifiedCodableData:Codable {
     public var dictionary:[String:Any] {
         var dic:[String:Any] = [:]
         bool.forEach{dic[$0.key] = $0.value}
-        number.forEach{dic[$0.key] = $0.value}
+        int.forEach{dic[$0.key] = $0.value}
+        double.forEach{dic[$0.key] = $0.value}
         date.forEach{dic[$0.key] = $0.value.timeIntervalSinceReferenceDate}
         string.forEach{dic[$0.key] = $0.value}
         data.forEach{dic[$0.key] = $0.value.base64EncodedString()}
         custom.forEach{dic[$0.key] = $0.value.dictionary}
 
         boolArray.forEach{dic[$0.key] = $0.value}
-        numberArray.forEach{dic[$0.key] = $0.value}
+        intArray.forEach{dic[$0.key] = $0.value}
+        doubleArray.forEach{dic[$0.key] = $0.value}
         dateArray.forEach{dic[$0.key] = $0.value.map{$0.timeIntervalSinceReferenceDate}}
         stringArray.forEach{dic[$0.key] = $0.value}
         dataArray.forEach{dic[$0.key] = $0.value.map{$0.base64EncodedString()}}
@@ -336,16 +340,16 @@ public struct CertifiedCodableData:Codable {
     public init(_ originalData:[String:Any]) {
         for item in originalData {
 
-            if let dado = item.value as? Bool            { bool        [item.key] = dado}
-            else if let dado = item.value as? Int             { number      [item.key] = Double(dado)}
-            else if let dado = item.value as? Double          { number      [item.key] = dado}
+            if let dado = item.value as? Bool                 { bool        [item.key] = dado}
+            else if let dado = item.value as? Int             { int         [item.key] = Int(dado)}
+            else if let dado = item.value as? Double          { double      [item.key] = Double(dado)}
             else if let dado = item.value as? Date            { date        [item.key] = dado}
             else if let dado = item.value as? String          { string      [item.key] = dado}
             else if let dado = item.value as? Data            { data        [item.key] = dado}
 
             else if let dado = item.value as? [Bool           ] { boolArray  [item.key] = dado}
-            else if let dado = item.value as? [Int            ] { numberArray[item.key] = dado.map{Double($0)}}
-            else if let dado = item.value as? [Double         ] { numberArray[item.key] = dado}
+            else if let dado = item.value as? [Int            ] { intArray   [item.key] = dado.map{Int($0)}}
+            else if let dado = item.value as? [Double         ] { doubleArray[item.key] = dado.map{Double($0)}}
             else if let dado = item.value as? [Date           ] { dateArray  [item.key] = dado}
             else if let dado = item.value as? [String         ] { stringArray[item.key] = dado}
             else if let dado = item.value as? [Data           ] { dataArray  [item.key] = dado}
