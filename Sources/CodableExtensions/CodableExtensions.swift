@@ -338,29 +338,29 @@ public struct CertifiedCodableData:Codable {
     }
 
     public init(_ originalData:[String:Any]) {
-        for var item in originalData {
+        for item in originalData {
             
-            item = (item as? (any RawRepresentable))?.rawValue ?? item // if Enum with rawvalue
+            let value = (item.value as? (any RawRepresentable))?.rawValue ?? item.value // if Enum with rawvalue
 
-            if      let dado = item.value as? Bool            { bool        [item.key] = dado}
-            else if let dado = item.value as? Int             { int         [item.key] = Int(dado)}
-            else if let dado = item.value as? Double          { double      [item.key] = Double(dado)}
-            else if let dado = item.value as? Date            { date        [item.key] = dado}
-            else if let dado = item.value as? String          { string      [item.key] = dado}
-            else if let dado = item.value as? Data            { data        [item.key] = dado}
+            if      let dado = value as? Bool            { bool        [item.key] = dado}
+            else if let dado = value as? Int             { int         [item.key] = Int(dado)}
+            else if let dado = value as? Double          { double      [item.key] = Double(dado)}
+            else if let dado = value as? Date            { date        [item.key] = dado}
+            else if let dado = value as? String          { string      [item.key] = dado}
+            else if let dado = value as? Data            { data        [item.key] = dado}
 
-            else if let dado = item.value as? [Bool           ] { boolArray  [item.key] = dado}
-            else if let dado = item.value as? [Int            ] { intArray   [item.key] = dado.map{Int($0)}}
-            else if let dado = item.value as? [Double         ] { doubleArray[item.key] = dado.map{Double($0)}}
-            else if let dado = item.value as? [Date           ] { dateArray  [item.key] = dado}
-            else if let dado = item.value as? [String         ] { stringArray[item.key] = dado}
-            else if let dado = item.value as? [Data           ] { dataArray  [item.key] = dado}
+            else if let dado = value as? [Bool           ] { boolArray  [item.key] = dado}
+            else if let dado = value as? [Int            ] { intArray   [item.key] = dado.map{Int($0)}}
+            else if let dado = value as? [Double         ] { doubleArray[item.key] = dado.map{Double($0)}}
+            else if let dado = value as? [Date           ] { dateArray  [item.key] = dado}
+            else if let dado = value as? [String         ] { stringArray[item.key] = dado}
+            else if let dado = value as? [Data           ] { dataArray  [item.key] = dado}
 
-            else if let dado = item.value as? CKAsset   { data[item.key] = dado.fileURL?.contentAsData}
-            else if let dado = item.value as? [CKAsset] { dataArray[item.key] = dado.compactMap{$0.fileURL?.contentAsData} }
+            else if let dado = value as? CKAsset   { data[item.key] = dado.fileURL?.contentAsData}
+            else if let dado = value as? [CKAsset] { dataArray[item.key] = dado.compactMap{$0.fileURL?.contentAsData} }
 
-            else if let dado = item.value as? [String:Any]   { custom      [item.key] = CertifiedCodableData(dado)}
-            else if let dado = item.value as? [[String:Any]] { customArray[item.key] = dado.map{CertifiedCodableData($0)} }
+            else if let dado = value as? [String:Any]   { custom      [item.key] = CertifiedCodableData(dado)}
+            else if let dado = value as? [[String:Any]] { customArray[item.key] = dado.map{CertifiedCodableData($0)} }
 
             else if let _ = item.value as? [Any         ] { stringArray[item.key] = []}
 
