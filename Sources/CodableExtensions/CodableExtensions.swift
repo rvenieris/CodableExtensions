@@ -179,6 +179,11 @@ public extension Decodable {
             throw FileManageError.canNotConvertData
         }
     }
+    /// Delete json file
+    static func delete(file:String? = nil)throws {
+        let url = try Self.urlOrJsonPath(from: file)
+        try FileManager.default.removeItem(at: url)
+    }
     
     static func urlOrJsonPath(from file:String? = nil)throws ->URL {
             // generates URL for documentDir/file.json
