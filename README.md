@@ -98,6 +98,10 @@ static func load(from dictionary:[String:Any])throws ->Self
 
 static func load(from array:[Any])throws ->Self
 
+/// Static delete json file
+static func delete(from file:String?)throws ->Self
+
+/// url helpers
 static func url()->URL
 
 static func url(from file:String?)->URL
