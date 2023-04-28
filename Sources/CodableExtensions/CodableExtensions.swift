@@ -48,9 +48,9 @@ public extension Encodable {
         guard let json:Data  = self.jsonData,
               let jsonObject = try? JSONSerialization.jsonObject(with: json, options: jSONSerializationDefaultReadingOptions) else {
             if #available(macOS 10.12, *) {
-                os_log("Cannot Decode %@ type as Dictionary", type:.error, String(describing: type(of:self)))
+                os_log("Cannot decode type %@ as Dictionary", type:.error, String(describing: type(of:self)))
             } else {
-                    // Fallback on earlier versions
+                print("Cannot decode type \(String(describing: type(of:self))) as Dictionary")
             }
             return nil
         }
@@ -64,7 +64,7 @@ public extension Encodable {
             return [key:value]
         }
             // else
-        os_log("Cannot Decode this type as Dictionary", type:.error)
+        os_log("[CodableExtensions] Cannot decode type %@ as Dictionary", type:.error, String(describing: type(of:self)))
         return nil
     }
     
@@ -72,7 +72,7 @@ public extension Encodable {
         do {
             return try JSONSerialization.jsonObject(with: JSONEncoder().encode(self), options:jSONSerializationDefaultReadingOptions) as? [Any]
         } catch {
-            os_log("Cannot Decode %@ type as Array", type:.error, String(describing: type(of:self)))
+            os_log("[CodableExtensions] Cannot decode type %@ as Array.\n[CodableExtensions] Error: %@", type:.error, String(describing: type(of:self)), error.localizedDescription)
         }
         return nil
     }
@@ -85,9 +85,9 @@ public extension Encodable {
     func save(in url:URL) throws {
         do {
             try JSONEncoder().encode(self).write(to: url)
-            os_log("Saved in %@", type:.info, String(describing: url))
+            os_log("[CodableExtensions] Saved in %@", type:.info, String(describing: url))
         } catch {
-            os_log("Can not save in %@", type:.error, String(describing: url))
+            os_log("[CodableExtensions] Could not save in %@.\n[CodableExtensions] Error: %@", type:.error, String(describing: url), error.localizedDescription)
             throw FileManageError.canNotSaveInFile
         }
     }
@@ -96,7 +96,7 @@ public extension Encodable {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
         guard let url = URL.localPath(for: fileName+ext) else {
-            os_log("invalud url for %@", type:.error, fileName+ext)
+            os_log("Invalid url for %@", type:.error, fileName+ext)
             throw FileManageError.invalidFileName
         }
         return url
@@ -124,7 +124,8 @@ public extension Decodable {
         do {
             return try JSONDecoder().decode(Self.self, from: data)
         } catch {
-            os_log("Can not read from %@", type:.error, String(describing: data))
+            os_log("[CodableExtensions] Could not read from %@.\n[CodableExtensions] Error: %@",
+                   type:.error, String(describing: data), error.localizedDescription)
             throw FileManageError.canNotConvertData
         }
     }
@@ -135,7 +136,7 @@ public extension Decodable {
             let data = try Data(contentsOf: url)
             return try Self.load(from: data)
         } catch {
-            os_log("Can not read from %@", type:.error, String(describing: url))
+            os_log("[CodableExtensions] Could not read from %@.\n[CodableExtensions] Error: %@", type:.error, String(describing: url), error.localizedDescription)
             throw FileManageError.canNotReadFile
         }
     }
@@ -146,13 +147,13 @@ public extension Decodable {
     
     static func load(fromString stringData:String)throws ->Self{
         guard let data = stringData.data(using: .utf8) else {
-            os_log("Can not read from %@", type:.error, stringData)
+            os_log("[CodableExtensions] Could not read from %@.\n[CodableExtensions] Error: String is not formatted with valid UTF-8.", type:.error, stringData)
             throw FileManageError.canNotConvertData
         }
         do {
             return try load(from: data)
         } catch {
-            os_log("Can not read from %@", type:.error, stringData)
+            os_log("[CodableExtensions] Could not read from %@.\n[CodableExtensions] Error: %@", type:.error, stringData, error.localizedDescription)
             throw FileManageError.canNotConvertData
         }
     }
@@ -165,7 +166,7 @@ public extension Decodable {
             else { throw FileManageError.canNotConvertData } // else throw error to catch
             return try Self.load(from: data)
         } catch let error {
-            os_log("Can not convert from dictionary to %@", type:.error, String(describing: Self.self))
+            os_log("[CodableExtensions] Could  not convert from dictionary to %@.\n[CodableExtensions] Error: %@", type:.error, String(describing: Self.self), error.localizedDescription)
             throw error
         }
     }
@@ -175,7 +176,7 @@ public extension Decodable {
             guard let data = array.asData else { throw FileManageError.canNotConvertData }
             return try Self.load(from: data)
         } catch {
-            os_log("Can not convert from array to %@", type:.error, String(describing: Self.self))
+            os_log("[CodableExtensions] Could not convert from array to %@.\n[CodableExtensions] Error: %@", type:.error, String(describing: Self.self), error.localizedDescription)
             throw FileManageError.canNotConvertData
         }
     }
@@ -225,7 +226,7 @@ public extension Data {
         do {
             return try JSONDecoder().decode(T.self, from: self)
         } catch {
-            os_log("Can not convert this: %@", type:.error, String(describing: self))
+            os_log("[CodableExtensions] Could not convert this: %@.\n[CodableExtensions] Error: %@", type:.error, String(describing: self), error.localizedDescription)
             throw FileManageError.canNotDecodeData
         }
     }
@@ -276,7 +277,7 @@ public extension URL {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
         guard let url = URL.localPath(for: fileName+ext) else {
-            os_log("invalud url for %@", type:.error, fileName+ext)
+            os_log("[CodableExtensions] Invalid url for %@", type:.error, fileName+ext)
             throw FileManageError.invalidFileName
         }
         return url
@@ -370,7 +371,7 @@ public struct CertifiedCodableData:Codable {
             else if let _ = item.value as? [Any         ] { stringArray[item.key] = []}
 
             else {
-                debugPrint("Unknown Type in originalData:   \(item.key) = \(item.value)   -> trying to decode into string")
+                debugPrint("[CodableExtensions] Unknown type in originalData:   \(item.key) = \(item.value)   -> trying to decode into string")
                 string      [item.key] = "\(item.value)"
             }
         }
