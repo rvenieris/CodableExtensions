@@ -206,17 +206,22 @@ public extension Decodable {
     /// Type Extensions
 public extension Data {
     
-    var toText:String {
-        return String(data: self, encoding: .utf8) ?? #""ERROR": "cannot decode into String"""#
+    var toText:String? {
+        guard let resultAsText = String(data: self, encoding: .utf8) else {
+            os_log("[CodableExtensions] Could not decode Data into String.", String(describing: Self.self))
+            return nil
+        }
+        return resultAsText
     }
     
-    var toDictionary:[AnyHashable:Any] {
+    var toDictionary:[AnyHashable:Any]? {
         if let dictionary = try? JSONSerialization.jsonObject(with: self, options: .mutableContainers) as? [AnyHashable: Any] { return dictionary }
             // else
         
         if let array = self.asArray as? Codable { return ["Array":array] }
             // else
-        return ["ERROR":"cannot decode into dictionary"]
+        os_log("[CodableExtensions] Could not decode Data into Dictionary.", String(describing: Self.self))
+        return nil
     }
     
     var toArray:[Codable]? { try? JSONSerialization.jsonObject(with: self, options: .mutableContainers) as? [Codable] }
