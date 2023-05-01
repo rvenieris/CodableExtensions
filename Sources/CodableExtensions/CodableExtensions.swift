@@ -42,7 +42,7 @@ public class CodableExtensionsLogging {
 
 fileprivate func log(_ message: String, success: Bool) {
     if CodableExtensionsLogging.shared.shouldPrint {
-        print("[CodableExtensions] \(success ? "" : "ERROR") \(message)")
+        print("\(success ? "" : "ERROR") \(message)")
     }
     for logAction in CodableExtensionsLogging.shared.logActions {
         logAction((message, success))
@@ -71,7 +71,7 @@ public extension Encodable {
         
         guard let json:Data  = self.jsonData,
               let jsonObject = try? JSONSerialization.jsonObject(with: json, options: jSONSerializationDefaultReadingOptions) else {
-            log("[CodableExtensions] Couldn't represent type \(String(describing: type(of:self))) as Dictionary because of a problem with an intermediate JSON representation", success: false)
+            log("Couldn't represent type \(String(describing: type(of:self))) as Dictionary because of a problem with an intermediate JSON representation", success: false)
             return nil
         }
             // if jsonObject is OK
@@ -84,7 +84,7 @@ public extension Encodable {
             return [key:value]
         }
             // else
-        log("[CodableExtensions] Couldn't represent type \(String(describing: type(of:self))) as Dictionary", success: false)
+        log("Couldn't represent type \(String(describing: type(of:self))) as Dictionary", success: false)
         return nil
     }
     
@@ -92,7 +92,7 @@ public extension Encodable {
         do {
             return try JSONSerialization.jsonObject(with: JSONEncoder().encode(self), options:jSONSerializationDefaultReadingOptions) as? [Any]
         } catch {
-            log("[CodableExtensions] Couldn't represent type \(String(describing: type(of:self))) as Array.", success: false)
+            log("Couldn't represent type \(String(describing: type(of:self))) as Array.", success: false)
             log(error.localizedDescription, success: false)
         }
         return nil
@@ -106,9 +106,9 @@ public extension Encodable {
     func save(in url:URL) throws {
         do {
             try JSONEncoder().encode(self).write(to: url)
-            log("[CodableExtensions] Saved in \(String(describing: url))", success: true)
+            log("Saved in \(String(describing: url))", success: true)
         } catch {
-            log("[CodableExtensions] Couldn't save in \(String(describing: url)).", success: false)
+            log("Couldn't save in \(String(describing: url)).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotSaveInFile
         }
@@ -118,7 +118,7 @@ public extension Encodable {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
         guard let url = URL.localPath(for: fileName+ext) else {
-            log("[CodableExtensions] Invalid URL for \(fileName+ext).", success: false)
+            log("Invalid URL for \(fileName+ext).", success: false)
             throw FileManageError.invalidFileName
         }
         return url
@@ -146,7 +146,7 @@ public extension Decodable {
         do {
             return try JSONDecoder().decode(Self.self, from: data)
         } catch {
-            log("[CodableExtensions] Couldn't decode from \(String(describing: data)).", success: false)
+            log("Couldn't decode from \(String(describing: data)).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotConvertData
         }
@@ -158,7 +158,7 @@ public extension Decodable {
             let data = try Data(contentsOf: url)
             return try Self.load(from: data)
         } catch {
-            log("[CodableExtensions] Couldn't load from \(String(describing: url)).", success: false)
+            log("Couldn't load from \(String(describing: url)).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotReadFile
         }
@@ -170,14 +170,14 @@ public extension Decodable {
     
     static func load(fromString stringData:String)throws ->Self{
         guard let data = stringData.data(using: .utf8) else {
-            log("[CodableExtensions] Couldn't decode string \(stringData.debugDescription).", success: false)
+            log("Couldn't decode string \(stringData.debugDescription).", success: false)
             log("String is not formatted with valid UTF-8.", success: false)
             throw FileManageError.canNotConvertData
         }
         do {
             return try load(from: data)
         } catch {
-            log("[CodableExtensions] Couldn't read from \(stringData.debugDescription).", success: false)
+            log("Couldn't read from \(stringData.debugDescription).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotConvertData
         }
@@ -191,7 +191,7 @@ public extension Decodable {
             else { throw FileManageError.canNotConvertData } // else throw error to catch
             return try Self.load(from: data)
         } catch let error {
-            log("[CodableExtensions] Couldn't convert from dictionary to \(String(describing: Self.self)).", success: false)
+            log("Couldn't convert from dictionary to \(String(describing: Self.self)).", success: false)
             log(error.localizedDescription, success: false)
             throw error
         }
@@ -202,7 +202,7 @@ public extension Decodable {
             guard let data = array.asData else { throw FileManageError.canNotConvertData }
             return try Self.load(from: data)
         } catch {
-            log("[CodableExtensions] Couldn't convert from array to \(String(describing: Self.self)).", success: false)
+            log("Couldn't convert from array to \(String(describing: Self.self)).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotConvertData
         }
@@ -235,7 +235,7 @@ public extension Data {
     
     var toText:String? {
         guard let resultAsText = String(data: self, encoding: .utf8) else {
-            log("[CodableExtensions] Couldn't decode Data into String.", success: false)
+            log("Couldn't decode Data into String.", success: false)
             return nil
         }
         return resultAsText
@@ -247,7 +247,7 @@ public extension Data {
         
         if let array = self.asArray as? Codable { return ["Array":array] }
             // else
-        log("[CodableExtensions] Couldn't decode Data into Dictionary.", success: false)
+        log("Couldn't decode Data into Dictionary.", success: false)
         return nil
     }
     
@@ -258,7 +258,7 @@ public extension Data {
         do {
             return try JSONDecoder().decode(T.self, from: self)
         } catch {
-            log("[CodableExtensions] Couldn't convert this: \(String(describing: self)).", success: false)
+            log("Couldn't convert this: \(String(describing: self)).", success: false)
             log(error.localizedDescription, success: false)
             throw FileManageError.canNotDecodeData
         }
@@ -310,7 +310,7 @@ public extension URL {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
         guard let url = URL.localPath(for: fileName+ext) else {
-            log("[CodableExtensions] Invalid url for \(fileName+ext)", success: false)
+            log("Invalid url for \(fileName+ext)", success: false)
             throw FileManageError.invalidFileName
         }
         return url
@@ -404,7 +404,7 @@ public struct CertifiedCodableData:Codable {
             else if let _ = item.value as? [Any         ] { stringArray[item.key] = []}
 
             else {
-                debugPrint("[CodableExtensions] Unknown type in originalData:   \(item.key) = \(item.value)   -> trying to decode into string")
+                debugPrint("Unknown type in originalData:   \(item.key) = \(item.value)   -> trying to decode into string")
                 string      [item.key] = "\(item.value)"
             }
         }
