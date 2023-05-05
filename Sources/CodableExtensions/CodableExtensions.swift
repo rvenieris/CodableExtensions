@@ -35,8 +35,12 @@ public class CodableExtensionsLogging {
     
     private init() {}
     
-    @MainActor public func addLogAction(_ action: @escaping (LogEntry) -> Void) {
+    @MainActor public func addLogAction(_ action: @escaping (LogEntry) -> Void, printingDocumentsDirectory: Bool = true) {
         self.logActions.append(action)
+        if printingDocumentsDirectory {
+            let documentDir = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
+            log("Documents directory: \(URL(fileURLWithPath: documentDir))", success: true)
+        }
     }
 }
 
@@ -106,7 +110,15 @@ public extension Encodable {
     func save(in url:URL) throws {
         do {
             try JSONEncoder().encode(self).write(to: url)
-            log("Saved in \(String(describing: url))", success: true)
+            let isURLInDocuments: Bool
+            if let documentsDirectoryURL = FileManager.default.urls(for: .documentDirectory, in: .allDomainsMask).first?.absoluteURL,
+               documentsDirectoryURL == url.deletingLastPathComponent()
+            {
+                isURLInDocuments = true
+            } else {
+                isURLInDocuments = false
+            }
+            log("Saved in \(String(describing: isURLInDocuments ? url.lastPathComponent : url.absoluteString))", success: true)
         } catch {
             log("Couldn't save in \(String(describing: url)).", success: false)
             log(error.localizedDescription, success: false)
