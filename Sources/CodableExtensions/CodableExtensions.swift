@@ -26,7 +26,7 @@ public extension Error {
 }
 
 public class CodableExtensionsLogging {
-    typealias LogEntry = (message: String, successful: Bool)
+    public typealias LogEntry = (message: String, successful: Bool)
     public private(set) static var shared = CodableExtensionsLogging()
     
     fileprivate var logActions = [(LogEntry) -> Void]()
