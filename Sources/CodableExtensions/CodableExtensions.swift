@@ -35,7 +35,7 @@ public class CodableExtensionsLogging {
     
     private init() {}
     
-    @MainActor func addLogAction(_ action: @escaping (LogEntry) -> Void) {
+    @MainActor public func addLogAction(_ action: @escaping (LogEntry) -> Void) {
         self.logActions.append(action)
     }
 }
