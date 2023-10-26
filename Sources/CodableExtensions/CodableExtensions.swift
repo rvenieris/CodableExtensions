@@ -8,6 +8,7 @@
 
 import Foundation
 import CloudKit // For decode CKAsset as a valid Data type convertible to otiginal asset type
+import CryptoKit
 import os.log
 
 public enum FileManageError:Error {
@@ -92,6 +93,23 @@ public extension Encodable {
         }
     }
     
+    @available(iOS 13.0, *)
+    func save(encryptWith key: SymmetricKey , to url: URL) throws {
+        do {
+            let encoder = JSONEncoder()
+            let data = try encoder.encode(self)
+            
+            let sealedBox = try AES.GCM.seal(data, using: key)
+            
+            try sealedBox.combined!.write(to: url)
+            
+            os_log("Saved in %@", type: .info, String(describing: url))
+        } catch {
+            os_log("Cannot save in %@", type: .error, String(describing: url))
+            throw FileManageError.canNotSaveInFile
+        }
+    }
+    
     func url(for name:String? = nil)throws ->URL {
         let fileName = name ?? String(describing: type(of: self))
         let ext = fileName.hasSuffix(".json") ? "" : ".json"
@@ -139,6 +157,28 @@ public extension Decodable {
             throw FileManageError.canNotReadFile
         }
     }
+    
+    @available(iOS 13.0, *)
+    static func load(from url: URL, decryptionKey: SymmetricKey) throws -> Self {
+        do {
+            // Read the encrypted data from the specified URL
+            let encryptedData = try Data(contentsOf: url)
+
+            // Decrypt the data using the provided decryption key
+            let sealedBox = try AES.GCM.SealedBox(combined: encryptedData)
+            let decryptedData = try AES.GCM.open(sealedBox, using: decryptionKey)
+
+            // Decode the decrypted data into your object
+            let decoder = JSONDecoder()
+            let decodedObject = try decoder.decode(Self.self, from: decryptedData)
+
+            return decodedObject
+        } catch {
+            os_log("Cannot read or decrypt data from %@", type: .error, String(describing: url))
+            throw FileManageError.canNotReadFile
+        }
+    }
+
     
     static func load(from file:String? = nil)throws ->Self {
         return try Self.load(from: Self.urlOrJsonPath(from: file))
