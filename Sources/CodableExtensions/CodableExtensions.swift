@@ -387,8 +387,9 @@ public struct CertifiedCodableData:Codable {
             
             let value = (item.value as? (any RawRepresentable))?.rawValue ?? item.value // if Enum with rawvalue
 
-            if      let dado = value as? Bool            { bool        [item.key] = dado}
-            else if let dado = value as? Int             { int         [item.key] = Int(dado)}
+            // if      let dado = value as? Bool            { bool        [item.key] = dado}
+            //else 
+                 if let dado = value as? Int             { int         [item.key] = Int(dado)}
             else if let dado = value as? Double          { double      [item.key] = Double(dado)}
             else if let dado = value as? Date            { date        [item.key] = dado}
             else if let dado = value as? String          { string      [item.key] = dado}
