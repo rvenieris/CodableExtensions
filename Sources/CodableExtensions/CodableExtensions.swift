@@ -94,6 +94,7 @@ public extension Encodable {
     }
     
     @available(iOS 13.0, *)
+    @available(watchOS 2, *)
     func save(encryptWith key: SymmetricKey , to url: URL) throws {
         do {
             let encoder = JSONEncoder()
@@ -159,6 +160,8 @@ public extension Decodable {
     }
     
     @available(iOS 13.0, *)
+    @available(OSX 10.15, *)
+    @available(watchOS 6.0, *)
     static func load(from url: URL, decryptionKey: SymmetricKey) throws -> Self {
         do {
             // Read the encrypted data from the specified URL
