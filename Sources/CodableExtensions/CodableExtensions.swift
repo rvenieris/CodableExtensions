@@ -94,7 +94,8 @@ public extension Encodable {
     }
     
     @available(iOS 13.0, *)
-    @available(watchOS 2, *)
+    @available(OSX 10.15, *)
+    @available(watchOS 6.0, *)
     func save(encryptWith key: SymmetricKey , to url: URL) throws {
         do {
             let encoder = JSONEncoder()
